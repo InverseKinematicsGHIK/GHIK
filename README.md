@@ -13,7 +13,7 @@ Look at [this video](https://www.youtube.com/watch?v=MMbubxV6SzE) that shows the
 
 ## Free Truebones Zoo Pack
 If you want to use Free Truebones Zoo pack please download it from [here](https://gumroad.com/l/skZMC). 
-A minimum amount of $2 usd must be selected, however, when it ask for a method of Payment but, you can use the freecode: truebones4freefree to download this amazing collection for free.
+A minimum amount of $2 usd must be selected, however, when it ask for a method of Payment you can use the freecode: truebones4freefree to download this amazing collection for free.
 
 
 
