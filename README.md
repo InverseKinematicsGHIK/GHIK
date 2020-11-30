@@ -15,5 +15,8 @@ Look at [this video](https://www.youtube.com/watch?v=MMbubxV6SzE) that shows the
 If you want to use Free Truebones Zoo pack please download it from [here](https://gumroad.com/l/skZMC). 
 A minimum amount of $2 usd must be selected, however, when it ask for a method of Payment you can use the freecode: truebones4freefree to download this amazing collection for free.
 
+## Demo videos
+* [IK benchmark for kinematic chains](https://github.com/InverseKinematicsGHIK/GHIK/raw/main/videos/demo_chains.mp4)
+* [MoCap reconstruction](https://github.com/InverseKinematicsGHIK/GHIK/raw/main/videos/demo_BVH.mp4)
 
 
