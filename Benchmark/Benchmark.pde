@@ -44,7 +44,7 @@ import java.util.Random;
 //-----------Customizable Benchmark Parameters ----------------------
 //-------------------------------------------------------------------
 int numJoints = 8; //Define the number of joints that each chain will contain
-Util.ConstraintType constraintType = Util.ConstraintType.MIX_CONSTRAINED; //Choose among Util.ConstraintType.NONE, Util.ConstraintType.HINGE, Util.ConstraintType.CONE_ELLIPSE, Util.ConstraintType.MIX_CONSTRAINED
+Util.ConstraintType constraintType = Util.ConstraintType.NONE; //Choose among Util.ConstraintType.NONE, Util.ConstraintType.HINGE, Util.ConstraintType.CONE_ELLIPSE, Util.ConstraintType.MIX_CONSTRAINED
 Util.SolverType solversType[] = {Util.SolverType.CCD, Util.SolverType.TIK, Util.SolverType.TRIK, Util.SolverType.BFIK_TRIK, Util.SolverType.TRIK_ECTIK}; //If you wish you could add other Solvers, as the ones listed above
 //-------------------------------------------------------------------
 
@@ -105,7 +105,8 @@ void setup() {
     solver.setTimesPerFrame(50); //Set number of times per frame the solver will be executed
     solver.setMaxIterations(50); //Ste the maximum iterations the solver will be executed
     if(constraintType != Util.ConstraintType.NONE){
-      solver.setSwapOrder(true);
+      //Uncomment to swap order from root to end effector and end effector to root at each iteration
+      //solver.setSwapOrder(true);
       //Uncomment to enable Dead lock resolution
       //solver.enableDeadLockResolution(true); 
       //solver.context().setLockTimesCriteria(10);
@@ -114,34 +115,11 @@ void setup() {
     solvers.get(i).setTarget(structures.get(i).get(numJoints - 1), targets.get(i));
     targets.get(i).setPosition(structures.get(i).get(numJoints - 1).position());
     //8. Register task
-    TimingTask task = new TimingTask() {
-      @Override
-      public void execute() {
-        if (solve) solver.solve();
-      }
-    };
-    task.run(20);
     Interpolator interpolator = new Interpolator(targets.get(i));
     interpolator.configHint(Interpolator.SPLINE);
     interpolators.add(interpolator);
   }
 
-  //define the interpolator task
-  task = new Task() {
-    @Override
-    public void execute() {
-      Vector pos = targets.get(0).position().get();
-      //interpolator.execute();
-      //update other targets
-      for (Node target : targets) {
-        if (target == targets.get(0)) continue;
-        Vector diff = Vector.subtract(targets.get(0).position(), pos);
-        target.translate(diff);
-        target.setOrientation(targets.get(0).orientation());
-      }
-    }
-  };
-  
   //Scene hints
   scene.enableHint(Scene.BACKGROUND, 0);
   scene.enableHint(Scene.AXES);
@@ -154,16 +132,16 @@ void draw() {
   directionalLight(102, 102, 102, 0, 5, 5);
   specular(255, 255, 255);
   shininess(10);
-
-  //Draw Constraints
+  for (int i = 0; i < solvers.size(); i++) {
+    if (solve) solvers.get(i).solve();
+  }
   scene.render();
   scene.beginHUD();
   for (int i = 0; i < solvers.size(); i++) {
     Util.printInfo(scene, solvers.get(i), structures.get(i).get(0).position());
   }
   scene.endHUD();
-  fill(255);
-  stroke(255);
+
 }
 
 
@@ -259,8 +237,10 @@ void keyPressed() {
 
   if (key == '0') {
     for (Solver s : solvers) {
-      if (s instanceof GHIK)
+      if (s instanceof GHIK){
+        ((GHIK) s).context().setOrientationWeight(1);
         ((GHIK) s).context().setDirection(!((GHIK) s).context().direction());
+      }
     }
   }
 
@@ -273,7 +253,7 @@ void keyPressed() {
     generatePath();
     for(Interpolator interpolator : interpolators){
       interpolator.enableRecurrence();
-      interpolator.run();
+      interpolator.run(1);
     }
   }
 

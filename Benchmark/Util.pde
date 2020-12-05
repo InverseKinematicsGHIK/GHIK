@@ -336,8 +336,9 @@ public static class Util {
     PGraphics pg = scene.context();
     pg.pushStyle();
     pg.fill(200);
-    pg.textSize(12);
+    pg.textSize(14);
     Vector pos = scene.screenLocation(basePosition);
+    
     if (solver instanceof GHIK) {
       GHIK GHIK = (GHIK) solver;
 
@@ -348,7 +349,7 @@ public static class Util {
         error += "\n Error (or): " + String.format("%.4f", GHIK.orientationError());
       }
       error += "\nAccum error : " + String.format("%.4f", solver.accumulatedError());
-      pg.text(heuristics + error + "\n iter : " + solver.lastIteration(), pos.x() - 30, pos.y() + 10, pos.x() + 30, pos.y() + 50);
+      pg.text(heuristics + error + "\n iter : " + solver.lastIteration(), pos.x() - 30, pos.y() + 20, pos.x() + 30, pos.y() + 70);
     }
 
     pg.popStyle();
