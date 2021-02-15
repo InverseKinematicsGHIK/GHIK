@@ -34,3 +34,6 @@ A minimum amount of $2 usd must be selected, however, when it ask for a method o
 * [Monkey](https://github.com/InverseKinematicsGHIK/GHIK/raw/main/videos/9Monkey.mp4)
 * [Dragon](https://github.com/InverseKinematicsGHIK/GHIK/raw/main/videos/7Dragon.mp4)
 
+**[Visual smoothness FABRIK vs TRIK](https://github.com/InverseKinematicsGHIK/GHIK/raw/main/videos/5FABRIKvsTRIK1.mp4)**
+
+
