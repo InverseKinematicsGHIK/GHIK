@@ -20,17 +20,17 @@ A minimum amount of $2 usd must be selected, however, when it ask for a method o
 ## Demo videos
 **IK benchmark for kinematic chains**
 
-* [Free](https://github.com/InverseKinematicsGHIK/GHIK/blob/main/videos/1Free.mp4)
-* [Hinge](https://github.com/InverseKinematicsGHIK/GHIK/blob/main/videos/2Hinge.mp4)
-* [Cone](https://github.com/InverseKinematicsGHIK/GHIK/blob/main/videos/3Cone.mp4)
-* [Mix](https://github.com/InverseKinematicsGHIK/GHIK/blob/main/videos/4Mix.mp4)
+* [Free](https://github.com/InverseKinematicsGHIK/GHIK/raw/main/videos/1Free.mp4)
+* [Hinge](https://github.com/InverseKinematicsGHIK/GHIK/raw/main/videos/2Hinge.mp4)
+* [Cone](https://github.com/InverseKinematicsGHIK/GHIK/raw/main/videos/3Cone.mp4)
+* [Mix](https://github.com/InverseKinematicsGHIK/GHIK/raw/main/videos/4Mix.mp4)
 
 **Mocap reconstruction**
 
-* [Human](https://github.com/InverseKinematicsGHIK/GHIK/blob/main/videos/8Human.mp4)
-* [Cat](https://github.com/InverseKinematicsGHIK/GHIK/blob/main/videos/6Cat.mp4)
-* [Spider](https://github.com/InverseKinematicsGHIK/GHIK/blob/main/videos/10Spider.mp4)
-* [Tyranno](https://github.com/InverseKinematicsGHIK/GHIK/blob/main/videos/11Tyranno.mp4)
-* [Monkey](https://github.com/InverseKinematicsGHIK/GHIK/blob/main/videos/9Monkey.mp4)
-* [Dragon](https://github.com/InverseKinematicsGHIK/GHIK/blob/main/videos/7Dragon.mp4)
+* [Human](https://github.com/InverseKinematicsGHIK/GHIK/raw/main/videos/8Human.mp4)
+* [Cat](https://github.com/InverseKinematicsGHIK/GHIK/raw/main/videos/6Cat.mp4)
+* [Spider](https://github.com/InverseKinematicsGHIK/GHIK/raw/main/videos/10Spider.mp4)
+* [Tyranno](https://github.com/InverseKinematicsGHIK/GHIK/raw/main/videos/11Tyranno.mp4)
+* [Monkey](https://github.com/InverseKinematicsGHIK/GHIK/raw/main/videos/9Monkey.mp4)
+* [Dragon](https://github.com/InverseKinematicsGHIK/GHIK/raw/main/videos/7Dragon.mp4)
 
