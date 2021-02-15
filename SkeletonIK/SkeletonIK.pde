@@ -72,16 +72,12 @@ void setup() {
     /*
       Choose among these solvers: 
         * GHIK.HeuristicMode.CCD
-        * GHIK.HeuristicMode.BFIK_CCD
         * GHIK.HeuristicMode.TIK
-        * GHIK.HeuristicMode.BFIK_TIK
         * GHIK.HeuristicMode.TRIK
-        * GHIK.HeuristicMode.BFIK_TRIK
-        * GHIK.HeuristicMode.ECTIK
-        * GHIK.HeuristicMode.TRIK_ECTIK
+        * GHIK.HeuristicMode.BFIK
    */
 
-    skeleton.enableIK(GHIK.HeuristicMode.TRIK_ECTIK);
+    skeleton.enableIK(GHIK.HeuristicMode.BFIK);
     //3. Lets create two Targets indicating the name of the leaf nodes. 
     skeleton.addTarget("Joint 5");
     skeleton.addTarget("Joint 6");

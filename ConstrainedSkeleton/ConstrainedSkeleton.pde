@@ -51,7 +51,7 @@ void setup(){
   joint3.setConstraint(constraint3);
   //---------------------------------------------------
   //Enable IK functionallity
-  skeleton.enableIK(GHIK.HeuristicMode.TRIK_ECTIK);
+  skeleton.enableIK(GHIK.HeuristicMode.BFIK);
   //Lets create a Targets indicating the name of the leaf nodes. 
   skeleton.addTarget("Joint 4");
   //If desired you could set the target position and orientation to be the same as the leaves of the structure 

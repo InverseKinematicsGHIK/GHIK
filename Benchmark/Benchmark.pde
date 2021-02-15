@@ -11,15 +11,10 @@ You can customize several Benchmark parameters as:
     - MIX_CONSTRAINED : Each joint has a random constraint.
 *) The Type of solvers to use: Add to the solversType array the IK Heuristic step we want to consider. Choose among:
     - CCD : Cyclic Coordinate Descent
-    - BFIK_CCD: Back and Forth - CCD
     - TIK: Triangulation
-    - BFIK_TIK: Back and Forth - Triangulation
     - TRIK: Translate and Reach IK
-    - BFIK_TRIK: Back and Forth - Translate and Reach IK 
-    - ECTIK: Extended CCD and Triangulation IK
-    - TRIK_ECTIK: Translate and Reach IK and Extended CCD Triangulation IK
-    - ECTIK_DAMP: Extended CCD and Triangulation IK with dampening
-    Preferable solver for unconstrained chain is TRIK, for constrained chains choose either TRIK_ECTIK or BFIK_TRIK.
+    - BFIK: Back and Forth IK 
+    Preferable solver for unconstrained chain is TRIK, for constrained chains choose BFIK.
     
 * Press 'p' to follow a continuous path and 's' to stop the interpolators.
 * Press 'w' to start/stop the solvers
@@ -45,7 +40,7 @@ import java.util.Random;
 //-------------------------------------------------------------------
 int numJoints = 8; //Define the number of joints that each chain will contain
 Util.ConstraintType constraintType = Util.ConstraintType.NONE; //Choose among Util.ConstraintType.NONE, Util.ConstraintType.HINGE, Util.ConstraintType.CONE_ELLIPSE, Util.ConstraintType.MIX_CONSTRAINED
-Util.SolverType solversType[] = {Util.SolverType.CCD, Util.SolverType.TIK, Util.SolverType.TRIK, Util.SolverType.BFIK_TRIK, Util.SolverType.TRIK_ECTIK}; //If you wish you could add other Solvers, as the ones listed above
+Util.SolverType solversType[] = {Util.SolverType.CCD, Util.SolverType.TIK, Util.SolverType.TRIK, Util.SolverType.BFIK}; //If you wish you could add other Solvers, as the ones listed above
 //-------------------------------------------------------------------
 
 //Scene Parameters
@@ -62,7 +57,7 @@ ArrayList<Node> idleSkeleton;
 ArrayList<Node> targets = new ArrayList<Node>(); //Keep targets
 ArrayList<Interpolator> interpolators = new ArrayList<Interpolator>(); //Interpolators
 boolean solve = true;
-Task task;
+float chain_length = 0; //chain length
 
 
 void settings() {
@@ -70,59 +65,77 @@ void settings() {
 }
 
 void setup() {
-  scene = new Scene(this);
-  if (scene.is3D()) scene.setType(Graph.Type.ORTHOGRAPHIC);
-  scene.setBounds(numJoints * 1f * boneLength);
-  scene.fit(1);
-  scene.leftHanded = false;
-  int numSolvers = solversType.length;
-  //1. Create Targets
-  targets = Util.createTargets(numSolvers, scene, targetRadius);
-  float alpha = 1.f * width / height > 1.5f ? 0.5f * width / height : 0.5f;
-  alpha *= numSolvers / 4f; //avoid undesirable overlapping
-  //2. Generate IK Chains
-  for (int i = 0; i < numSolvers; i++) {
-    float offset = numSolvers == 1 ? 0 : i * 2 * alpha * scene.radius() / (numSolvers - 1) - alpha * scene.radius();
-    int r = (int) random(255), g = (int) random(255), b = (int) random(255);
-    structures.add(Util.generateAttachedChain(scene, numJoints, 0.7f * targetRadius, boneLength, new Vector(offset, 0, 0), color(r, g, b), randRotation, randLength));
-  }
-  //3. Apply constraints
-  for (ArrayList<Node> structure : structures) {
-    Util.generateConstraints(structure, constraintType, 29, scene.is3D());
-  }
-  idleSkeleton = Util.detachedCopy(structures.get(0)); //Dummy chain 
-  //4. Set eye scene
-  scene.eye().rotate(new Quaternion(new Vector(1, 0, 0), PI / 2.f));
-  scene.eye().rotate(new Quaternion(new Vector(0, 1, 0), PI));
-  //5. generate solvers
-  solvers = new ArrayList<Solver>();
-  for (int i = 0; i < numSolvers; i++) {
-    final GHIK solver = Util.createSolver(solversType[i], structures.get(i));
-    solvers.add(solver);
-    //6. Define solver parameters
-    solver.setMaxError(0.001); //Set error threshold
-    solver.setMinDistance(0); //Set minimum distance 
-    solver.setTimesPerFrame(50); //Set number of times per frame the solver will be executed
-    solver.setMaxIterations(50); //Ste the maximum iterations the solver will be executed
-    if(constraintType != Util.ConstraintType.NONE){
-      //Uncomment to swap order from root to end effector and end effector to root at each iteration
-      //solver.setSwapOrder(true);
-      //Uncomment to enable Dead lock resolution
-      //solver.enableDeadLockResolution(true); 
-      //solver.context().setLockTimesCriteria(10);
+    randomSeed(0);
+    PFont myFont = createFont("Times New Roman Bold", 50, true);
+    textFont(myFont);
+    scene = new Scene(this);
+    if (scene.is3D()) scene.setType(Graph.Type.ORTHOGRAPHIC);
+    scene.setBounds(numJoints * 1f * boneLength);
+    scene.leftHanded = false;
+    int numSolvers = solversType.length;
+    //1. Create Targets
+    targets = Util.createTargets(numSolvers, scene, targetRadius);
+    float alpha = 1.f * width / height > 1.5f ? 0.5f * width / height : 0.5f;
+    alpha *= numSolvers / 4f; //avoid undesirable overlapping
+    //2. Generate IK Chains
+    chain_length = 0;
+    for (int i = 0; i < numSolvers; i++) {
+      float offset = numSolvers == 1 ? 0 : i * 2 * alpha * scene.radius() / (numSolvers - 1) - alpha * scene.radius();
+      int r = (int) random(255), g = (int) random(255), b = (int) random(255);
+      structures.add(Util.generateAttachedChain(scene, numJoints, 0.7f * targetRadius, boneLength, new Vector(offset, 0, 0), color(r, g, b), randRotation, randLength));
     }
-    //7. Set targets
-    solvers.get(i).setTarget(structures.get(i).get(numJoints - 1), targets.get(i));
-    targets.get(i).setPosition(structures.get(i).get(numJoints - 1).position());
-    //8. Register task
-    Interpolator interpolator = new Interpolator(targets.get(i));
-    interpolator.configHint(Interpolator.SPLINE);
-    interpolators.add(interpolator);
-  }
+    //Calculate height
+    chain_length = 0;
+    for(int i = 1; i < structures.get(0).size(); i++){
+      Node n = structures.get(0).get(i);
+      chain_length += Vector.distance(n.position(), n.reference().position());
+    }
+    println("Height : " + chain_length);
 
-  //Scene hints
-  scene.enableHint(Scene.BACKGROUND, 0);
-  scene.enableHint(Scene.AXES);
+    //3. Apply constraints
+    for (ArrayList<Node> structure : structures) {
+      Util.generateConstraints(structure, constraintType, 13, scene.is3D());
+    }
+    idleSkeleton = Util.detachedCopy(structures.get(0)); //Dummy chain
+    //4. Set eye scene
+    scene.eye().rotate(new Quaternion(new Vector(1, 0, 0), -PI / 2.f));
+    //scene.eye().rotate(new Quaternion(new Vector(0, 1, 0), PI));
+    //5. generate solvers
+    solvers = new ArrayList<Solver>();
+    for (int i = 0; i < numSolvers; i++) {
+      final Solver solver = Util.createSolver(solversType[i], structures.get(i));
+      solvers.add(solver);
+      //6. Define solver parameters
+      solver.setMaxError(0.001f * chain_length); //Set error threshold
+      solver.setMinDistance(0); //Set minimum distance
+      solver.setTimesPerFrame(50); //Set number of times per frame the solver will be executed
+      solver.setMaxIterations(50); //Ste the maximum iterations the solver will be executed
+      if(constraintType != Util.ConstraintType.NONE){
+        //Uncomment to swap order from root to end effector and end effector to root at each iteration
+        //solver.setSwapOrder(true);
+        ((GHIK)solver).enableDeadLockResolution(true);
+      }
+      //7. Set targets
+      solvers.get(i).setTarget(structures.get(i).get(numJoints - 1), targets.get(i));
+      targets.get(i).setPosition(structures.get(i).get(numJoints - 1).position());
+      //8. Register task
+      Interpolator interpolator = new Interpolator(targets.get(i));
+      interpolator.configHint(Interpolator.SPLINE);
+      interpolators.add(interpolator);
+    }
+
+    //Scene hints
+    scene.enableHint(Scene.BACKGROUND, 0);
+    scene.enableHint(Scene.AXES);
+    scene.eye().rotate(new Quaternion(PI/2,0,0));
+    scene.fit();
+
+    scene.eye().setConstraint(new Constraint() {
+      @Override
+      public Quaternion constrainRotation(Quaternion rotation, Node node) {
+        return new Quaternion(0,rotation.eulerAngles().y(),0);
+      }
+    });
 }
 
 void draw() {
@@ -137,11 +150,18 @@ void draw() {
   }
   scene.render();
   scene.beginHUD();
+  pushStyle();
+  textSize(50);
+  fill(255);
+  stroke(255);
+  textAlign(CENTER, CENTER);
+  text("IK Heuristic steps benchmark", width * 0.5f, 100);
+  popStyle();
+
   for (int i = 0; i < solvers.size(); i++) {
-    Util.printInfo(scene, solvers.get(i), structures.get(i).get(0).position());
+    Util.printInfo(scene, solvers.get(i), structures.get(i).get(0).position(), chain_length);
   }
   scene.endHUD();
-
 }
 
 

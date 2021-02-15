@@ -1,6 +1,6 @@
 public static class Util {
   public enum ConstraintType {NONE, HINGE, CONE_POLYGON, CONE_ELLIPSE, CONE_CIRCLE, MIX, HINGE_ALIGNED, MIX_CONSTRAINED}
-  public enum SolverType {CCD, BFIK_CCD, TIK, BFIK_TIK, TRIK, BFIK_TRIK, ECTIK, ECTIK_DAMP, TRIK_ECTIK}
+  public enum SolverType {CCD, TIK, TRIK, BFIK}
 
   public static GHIK createSolver(SolverType type, List<Node> structure) {
     switch (type) {
@@ -9,18 +9,8 @@ public static class Util {
         return solver;
       }
 
-      case BFIK_CCD:{
-        GHIK solver = new GHIK(structure, GHIK.HeuristicMode.BFIK_CCD);
-        return solver;
-      }
-
       case TRIK:{
         GHIK solver = new GHIK(structure, GHIK.HeuristicMode.TRIK);
-        return solver;
-      }
-
-      case BFIK_TRIK:{
-        GHIK solver = new GHIK(structure, GHIK.HeuristicMode.BFIK_TRIK);
         return solver;
       }
 
@@ -29,23 +19,8 @@ public static class Util {
         return solver;
       }
 
-      case BFIK_TIK:{
-        GHIK solver = new GHIK(structure, GHIK.HeuristicMode.BFIK_TIK);
-        return solver;
-      }
-
-      case ECTIK_DAMP:{
-        GHIK solver = new GHIK(structure, GHIK.HeuristicMode.ECTIK_DAMP);
-        return solver;
-      }
-
-      case ECTIK:{
-        GHIK solver = new GHIK(structure, GHIK.HeuristicMode.ECTIK);
-        return solver;
-      }
-
-      case TRIK_ECTIK:{
-        GHIK solver = new GHIK(structure, GHIK.HeuristicMode.TRIK_ECTIK);
+      case BFIK:{
+        GHIK solver = new GHIK(structure, GHIK.HeuristicMode.BFIK);
         return solver;
       }
 
@@ -332,28 +307,29 @@ public static class Util {
     }
   }
 
-  public static void printInfo(Scene scene, Solver solver, Vector basePosition) {
+  public static void printInfo(Scene scene, Solver solver, Vector basePosition, float sk_height) {
     PGraphics pg = scene.context();
     pg.pushStyle();
-    pg.fill(200);
-    pg.textSize(14);
+    pg.fill(255);
+    pg.textSize(25);
     Vector pos = scene.screenLocation(basePosition);
-    
     if (solver instanceof GHIK) {
       GHIK GHIK = (GHIK) solver;
-
       String heuristics = String.join(" ", GHIK.mode().name().split("_"));
+
       if (GHIK.enableTwist()) heuristics += "\nWITH TWIST";
-      String error = "\n Error (pos): " + String.format("%.4f", GHIK.positionError());
+      String error = "\n Error (pos): " + String.format("%.3f", solver.error() / sk_height * 100f) + "%";
+      error += "\nAverage error : " + String.format("%.3f", solver.averageError()  / sk_height * 100f) + "%";
+
       if (GHIK.direction()) {
-        error += "\n Error (or): " + String.format("%.4f", GHIK.orientationError());
+        error += "\n Error (or): " + String.format("%.3f", GHIK.orientationError());
       }
-      error += "\nAccum error : " + String.format("%.4f", solver.accumulatedError());
-      pg.text(heuristics + error + "\n iter : " + solver.lastIteration(), pos.x() - 30, pos.y() + 20, pos.x() + 30, pos.y() + 70);
+      pg.text(heuristics + error + "\n iter : " + solver.lastIteration(), pos.x() - 30, pos.y() + 10, pos.x() + 30, pos.y() + 50);
     }
 
     pg.popStyle();
   }
+
 
   public static ArrayList<Node> detachedCopy(List<? extends Node> chain) {
     ArrayList<Node> copy = new ArrayList<Node>();
