@@ -18,7 +18,16 @@ If you want to use Free Truebones Zoo pack please download it from [here](https:
 A minimum amount of $2 usd must be selected, however, when it ask for a method of Payment you can use the freecode: truebones4freefree to download this amazing collection for free.
 
 ## Demo videos
-* [IK benchmark for kinematic chains](https://github.com/InverseKinematicsGHIK/GHIK/raw/main/videos/demo_chains.mp4)
-* [MoCap reconstruction](https://github.com/InverseKinematicsGHIK/GHIK/raw/main/videos/demo_BVH.mp4)
-
+**IK benchmark for kinematic chains
+* [Free](https://github.com/InverseKinematicsGHIK/GHIK/blob/main/videos/1Free.mp4)
+* [Hinge](https://github.com/InverseKinematicsGHIK/GHIK/blob/main/videos/2Hinge.mp4)
+* [Cone](https://github.com/InverseKinematicsGHIK/GHIK/blob/main/videos/3Cone.mp4)
+* [Mix](https://github.com/InverseKinematicsGHIK/GHIK/blob/main/videos/4Mix.mp4)
+**Mocap reconstruction 
+* [Human](https://github.com/InverseKinematicsGHIK/GHIK/blob/main/videos/8Human.mp4)
+* [Cat](https://github.com/InverseKinematicsGHIK/GHIK/blob/main/videos/6Cat.mp4)
+* [Spider](https://github.com/InverseKinematicsGHIK/GHIK/blob/main/videos/10Spider.mp4)
+* [Tyranno](https://github.com/InverseKinematicsGHIK/GHIK/blob/main/videos/11Tyranno.mp4)
+* [Monkey](https://github.com/InverseKinematicsGHIK/GHIK/blob/main/videos/9Monkey.mp4)
+* [Dragon](https://github.com/InverseKinematicsGHIK/GHIK/blob/main/videos/7Dragon.mp4)
 
