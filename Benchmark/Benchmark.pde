@@ -38,9 +38,9 @@ import java.util.Random;
 //-------------------------------------------------------------------
 //-----------Customizable Benchmark Parameters ----------------------
 //-------------------------------------------------------------------
-int numJoints = 8; //Define the number of joints that each chain will contain
+int numJoints = 10; //Define the number of joints that each chain will contain
 Util.ConstraintType constraintType = Util.ConstraintType.NONE; //Choose among Util.ConstraintType.NONE, Util.ConstraintType.HINGE, Util.ConstraintType.CONE_ELLIPSE, Util.ConstraintType.MIX_CONSTRAINED
-Util.SolverType solversType[] = {Util.SolverType.CCD, Util.SolverType.TIK, Util.SolverType.TRIK, Util.SolverType.BFIK}; //If you wish you could add other Solvers, as the ones listed above
+Util.SolverType solversType[] = {Util.SolverType.CCD, Util.SolverType.TIK, Util.SolverType.FABRIK, Util.SolverType.TRIK, Util.SolverType.BFIK}; //If you wish you could add other Solvers, as the ones listed above
 //-------------------------------------------------------------------
 
 //Scene Parameters
@@ -106,14 +106,14 @@ void setup() {
       final Solver solver = Util.createSolver(solversType[i], structures.get(i));
       solvers.add(solver);
       //6. Define solver parameters
-      solver.setMaxError(0.001f * chain_length); //Set error threshold
+      solver.setMaxError(0.001f); //Set error threshold
       solver.setMinDistance(0); //Set minimum distance
       solver.setTimesPerFrame(50); //Set number of times per frame the solver will be executed
       solver.setMaxIterations(50); //Ste the maximum iterations the solver will be executed
       if(constraintType != Util.ConstraintType.NONE){
         //Uncomment to swap order from root to end effector and end effector to root at each iteration
         //solver.setSwapOrder(true);
-        ((GHIK)solver).enableDeadLockResolution(true);
+        if(solver instanceof GHIK)((GHIK)solver).enableDeadLockResolution(true);
       }
       //7. Set targets
       solvers.get(i).setTarget(structures.get(i).get(numJoints - 1), targets.get(i));

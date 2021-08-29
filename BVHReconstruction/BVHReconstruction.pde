@@ -12,7 +12,12 @@ You can also use any bhv file, for instance:
   
 Two Skeletons are shown, the white one represents the original motion, the green one is the reconstructed motion using IK. If desired, you can setup the heuristic to use.
 
-Press 'w' to start/stop the bvh animation and solve IK. 
+Press 'w' to start/stop the bvh animation and solve IK.
+Otherwise press 's' to one Posture at a time.
+Press 'h' to show/hide hints.
+Press 'r' to show/hide original skeleton.
+
+
 Drag with right and left mouse buttons to translate, rotate the eye scene. Scroll to zoom in/out.
 */
 
@@ -51,16 +56,16 @@ String[] example_paths = new String[]{
 
 String path = example_paths[0];
 
-//The heuristic mode defines the kind of algorithm to use most common options are:
+//The heuristic mode defines the kind of algorithm to use. Available options are:
 /*
-  Choose among these solvers: 
-    * GHIK.HeuristicMode.CCD
-    * GHIK.HeuristicMode.TIK
-    * GHIK.HeuristicMode.TRIK
-    * GHIK.HeuristicMode.BFIK
- Preferred heuristic is BFIK.
+    * CCD
+    * TIK
+    * FABRIK
+    * TRIK
+    * BFIK
 */
-GHIK.HeuristicMode mode = GHIK.HeuristicMode.BFIK;
+Mode solverMode = Mode.BFIK;
+
 //---------------------------------------------------------------------------------------------------
 
 Scene scene;
@@ -78,6 +83,11 @@ boolean showParams = false, useWristAnkles = true;
 float skeletonHeight = 0;
 float avg_error = 0;
 int skip = 1;
+
+
+enum Mode{
+  CCD, TIK, FABRIK, TRIK, BFIK
+}
 
 public void settings(){
     fullScreen(P3D);
@@ -120,8 +130,8 @@ public void setup(){
     IKSkeleton.setRadius(scene.radius() * 0.01f);
     IKSkeleton.setBoneWidth(scene.radius() * 0.01f);
     
-    IKSkeleton.enableIK(mode);
-    IKSkeleton.enableDirection(true, true); //Enable - Disable target direction.
+    setSolver(solverMode);
+    IKSkeleton.enableDirection(true, true);
     IKSkeleton.setMaxError(0.001f * skeletonHeight);
     IKSkeleton.addTargets();
     //Relocate the skeletons
@@ -158,12 +168,22 @@ public void draw(){
     if(readNext) readNextPosture(skip);
 }
 
+boolean cull = false;
 public void keyPressed(){
     if(key == 'W' || key == 'w'){
         readNext = !readNext;
     }
     if(key == 'S' || key == 's'){
         readNextPosture(skip);
+    }
+    
+    if(key == 'h' || key == 'H'){
+        toggleHints();
+    }
+    
+    if(key == 'r' || key == 'R'){
+      cull = !cull;
+      loader.skeleton().cull(cull);
     }
 }
 
@@ -191,6 +211,36 @@ public void mouseClicked(MouseEvent event){
             scene.focus();
         else
             scene.align();
+}
+
+public void setSolver(Mode mode){
+  switch (mode){
+      case CCD:{
+          IKSkeleton.setColor(color(245, 197, 66));
+          IKSkeleton.enableIK(GHIK.HeuristicMode.CCD);
+          break;
+      }
+      case TIK: {
+          IKSkeleton.setColor(color(35, 252, 245));
+          IKSkeleton.enableIK(GHIK.HeuristicMode.TIK);
+          break;
+      }
+      case BFIK:{
+          IKSkeleton.setColor(color(0,255,0));
+          IKSkeleton.enableIK(GHIK.HeuristicMode.BFIK);
+          break;
+      }
+      case TRIK:{
+          IKSkeleton.setColor(color(163, 24, 159));
+          IKSkeleton.enableIK(GHIK.HeuristicMode.TRIK);
+          break;
+      }
+      case FABRIK:{
+          IKSkeleton.setColor(color(255,0,0));
+          IKSkeleton.enableFABRIK();
+          break;
+      }
+  }
 }
 
 public void readNextPosture(int skip){
@@ -338,7 +388,7 @@ public void drawInfo(float x, float y, float w, float h){
     y_col = y + k++ * (1.f * h / (n + 1));
     float e = IKSkeleton.solvers().get(0).error() / IKSkeleton.endEffectors().size();
     e = Math.max(0, e - 0.001f * skeletonHeight );
-    text("Average distance error per end effector: " + String.format("%.2f",  e / skeletonHeight * 100) + "%", x + 10, y_col);
+    text("Average distance pos. error per end effector: " + String.format("%.2f",  e / skeletonHeight * 100) + "%", x + 10, y_col);
 
 
 
@@ -492,7 +542,7 @@ public void removeChildren(BVHLoader loader, String names[]){
 public void toggleHints(){
     for(Node n : IKSkeleton.joints().values()){
         if(showParams){
-            n.enableHint(Node.AXES);
+            n.enableHint(Node.AXES, scene.radius() * 0.03);
             n.enableHint(Node.CONSTRAINT);
         } else{
             n.disableHint(Node.AXES);
@@ -501,7 +551,7 @@ public void toggleHints(){
     }
     for(Node n : loader.skeleton().joints().values()){
         if(showParams){
-            n.enableHint(Node.AXES);
+            n.enableHint(Node.AXES, scene.radius() * 0.03);
             n.enableHint(Node.CONSTRAINT);
         } else{
             n.disableHint(Node.AXES);

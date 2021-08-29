@@ -1,8 +1,11 @@
+import nub.ik.solver.fabrik.FABRIKChain;
+import nub.ik.solver.fabrik.FABRIKTree;
+
 public static class Util {
   public enum ConstraintType {NONE, HINGE, CONE_POLYGON, CONE_ELLIPSE, CONE_CIRCLE, MIX, HINGE_ALIGNED, MIX_CONSTRAINED}
-  public enum SolverType {CCD, TIK, TRIK, BFIK}
+  public enum SolverType {CCD, TIK, TRIK, FABRIK, BFIK}
 
-  public static GHIK createSolver(SolverType type, List<Node> structure) {
+  public static Solver createSolver(SolverType type, List<Node> structure) {
     switch (type) {
       case CCD:{
         GHIK solver = new GHIK(structure, GHIK.HeuristicMode.CCD);
@@ -22,6 +25,10 @@ public static class Util {
       case BFIK:{
         GHIK solver = new GHIK(structure, GHIK.HeuristicMode.BFIK);
         return solver;
+      }
+
+      case FABRIK:{
+        return new FABRIKChain(structure);
       }
 
       default:
@@ -70,7 +77,7 @@ public static class Util {
     else
       redBall = pg.createShape(ELLIPSE, 0, 0, targetRadius, targetRadius);
     redBall.setStroke(false);
-    redBall.setFill(-65536);
+    redBall.setFill(pg.color(255, 0, 0));
 
     for (int i = 0; i < num; i++) {
       Node target = createTarget(scene, redBall, targetRadius);
@@ -311,22 +318,30 @@ public static class Util {
     PGraphics pg = scene.context();
     pg.pushStyle();
     pg.fill(255);
-    pg.textSize(25);
+    pg.textSize(24);
     Vector pos = scene.screenLocation(basePosition);
+    float off = 30;
     if (solver instanceof GHIK) {
       GHIK GHIK = (GHIK) solver;
       String heuristics = String.join(" ", GHIK.mode().name().split("_"));
-
+      if(heuristics.equals("BFIK")){
+        heuristics = "B&FIK";
+      }
       if (GHIK.enableTwist()) heuristics += "\nWITH TWIST";
-      String error = "\n Error (pos): " + String.format("%.3f", solver.error() / sk_height * 100f) + "%";
+      String error = "\n Error (pos): " + String.format("%.3f", ((GHIK) solver).positionError() / sk_height * 100f) + "%";
       error += "\nAverage error : " + String.format("%.3f", solver.averageError()  / sk_height * 100f) + "%";
 
       if (GHIK.direction()) {
         error += "\n Error (or): " + String.format("%.3f", GHIK.orientationError());
       }
-      pg.text(heuristics + error + "\n iter : " + solver.lastIteration(), pos.x() - 30, pos.y() + 10, pos.x() + 30, pos.y() + 50);
+      //error += "\nAverage error : " + solver.accumulatedError() / fc;
+      pg.text(heuristics + error + "\n iter : " + solver.lastIteration(), pos.x() - 30, pos.y() + 10 + off);
+    } else if (solver instanceof FABRIKChain) {
+      String heuristics = "FABRIK";
+      String error = "\n Error (pos): " + String.format("%.3f", solver.error() / sk_height * 100f) + "%";
+      error += "\nAverage error : " + String.format("%.3f", (solver.averageError() ) / sk_height * 100f) + "%";
+      pg.text(heuristics + error + "\n iter : " + solver.lastIteration(), pos.x() - 30, pos.y() + 10 + off);
     }
-
     pg.popStyle();
   }
 
