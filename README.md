@@ -18,7 +18,7 @@ If you want to use Free Truebones Zoo pack please download it from [here](https:
 A minimum amount of $2 usd must be selected, however, when it ask for a method of Payment you can use the freecode: truebones4freefree to download this amazing collection for free.
 
 ## Demo videos
-** Algorithm Visualizations**
+**Algorithm Visualizations**
 
 * [CCD](https://github.com/InverseKinematicsGHIK/GHIK/raw/main/videos/Explanations/1_CCD_explanation.mp4)
 * [TIK](https://github.com/InverseKinematicsGHIK/GHIK/raw/main/videos/Explanations/2_TIK_explanation.mp4)
